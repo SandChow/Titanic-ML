@@ -1,9 +1,11 @@
 import pandas
-from sklearn.ensemble import RandomForestClassifier
 import re
+from sklearn.cross_validation import KFold
 from sklearn.feature_selection import SelectKBest, f_classif
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn import linear_model
 
 # import data into script.
 train = pandas.read_csv("train.csv")
@@ -34,6 +36,7 @@ test["Fare"] = test["Fare"].fillna(test["Fare"].median())
 
 # generating a familysize column
 train["FamilySize"] = train["SibSp"] + train["Parch"]
+test["FamilySize"] = test["SibSp"] + test["Parch"]
 
 # the .apply method generates a new series
 train["NameLength"] = train["Name"].apply(lambda x: len(x))
@@ -77,9 +80,26 @@ plt.show()
 # best predictors
 bestPredictors = ["Pclass", "Sex", "Fare", "Title"]
 
-alg = RandomForestClassifier(random_state=1, n_estimators=150, min_samples_split=8, min_samples_leaf=4)
-alg.fit(train[bestPredictors], train["Survived"])
-predictions = alg.predict(test[bestPredictors])
+# The algorithms we want to ensemble.
+algorithms = [
+    [GradientBoostingClassifier(random_state=1, n_estimators=25, max_depth=3), ["Pclass", "Sex", "Age", "Fare",
+                                                                                "Embarked", "FamilySize", "Title"]],
+    [linear_model.LogisticRegression(random_state=1), ["Pclass", "Sex", "Fare", "FamilySize", "Title", "Age",
+                                                       "Embarked"]]]
+
+full_predictions = []
+for alg, predictors in algorithms:
+    # Fit the algorithm using the full training data.
+    alg.fit(train[predictors], train["Survived"])
+    # Predict using the test dataset.  We have to convert all the columns to floats to avoid an error.
+    predictions = alg.predict_proba(test[predictors].astype(float))[:, 1]
+    full_predictions.append(predictions)
+
+# The gradient boosting classifier generates better predictions, so we weight it higher.
+predictions = (full_predictions[0] * 3 + full_predictions[1]) / 4
+predictions[predictions <= .5] = 0
+predictions[predictions > .5] = 1
+predictions = predictions.astype(int)
 
 # dataframe for submission with PassengerId and Survived columns.
 submission = pandas.DataFrame({"PassengerId": test["PassengerId"],

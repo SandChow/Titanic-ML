@@ -1,5 +1,5 @@
 import pandas
-from sklearn import linear_model
+from sklearn.ensemble import RandomForestClassifier
 
 # import data into script.
 train = pandas.read_csv("train.csv")
@@ -30,8 +30,10 @@ test["Fare"] = test["Fare"].fillna(test["Fare"].median())
 
 # information used to determine whether the passenger survived.
 predictors = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
-# initialize the algorithm.
-alg = linear_model.LogisticRegression(random_state=1)
+# n_estimators is the number of trees we want to make
+# min_samples_split is the minimum number of rows we need to make a split
+# min_samples_leaf is the minimum number of samples we can have at the place where a tree branch ends.
+alg = RandomForestClassifier(random_state=1, n_estimators=150, min_samples_split=4, min_samples_leaf=2)
 # train the algorithm
 alg.fit(train[predictors], train["Survived"])
 # predictions for test set.

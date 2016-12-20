@@ -7,5 +7,5 @@ def classify(features_train, labels_train):
     ### return the fit classifier
 
     classifier = GaussianNB()
-    classifier.train(features_train, labels_train)
+    classifier.fit(features_train, labels_train)
     return classifier

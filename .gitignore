@@ -1,0 +1,12 @@
+*.pyc
+*.png
+udacity/ud120-projects/enron_mail_20110402.tgz
+udacity/ud120-projects/enron_mail_20110402/
+udacity/ud120-projects/enron_mail_20150507.tgz
+udacity/ud120-projects/maildir/
+udacity/ud120-projects/text_learning/your_word_data.pkl
+udacity/ud120-projects/text_learning/your_email_authors.pkl
+udacity/ud120-projects/my_classifier.pkl
+udacity/ud120-projects/my_dataset.pkl
+udacity/ud120-projects/my_feature_list.pkl
+udacity/ud120-projects/final_project/emails_by_address
